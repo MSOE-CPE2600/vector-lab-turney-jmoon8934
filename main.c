@@ -25,16 +25,21 @@ int main(void)
     b.z = 3;
 
     myvector c = vectsub(&a, &b);
+    myvector d = vectadd(&a, &b);
     char vecta[50];
     char vectb[50];
     char vectc[50];
+    char vectb[50];
     vectlist(&a, vectb);
     vectlist(&b, vectb);
     vectlist(&c, vectc);
+    vectlist(&d, vectd);
     printf("Vector a's value is %s\n", vecta);
     printf("Vector b's value is %s\n", vectb);
     printf("Vector c = a-b\n");
     printf("Vector c's value is %s", vectc);
+    printf("Vector d = a+b\n");
+    printf("Vector d's value is %s", vectc);
 
 
     return 0;
