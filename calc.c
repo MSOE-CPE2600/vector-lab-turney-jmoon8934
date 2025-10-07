@@ -16,7 +16,7 @@ myvector vectadd(myvector *a, myvector *b)
     return result;
 }
 
-myvector vectorsub(myvector *a, myvector *b)
+myvector vectsub(myvector *a, myvector *b)
 {
     myvector result;
     result.x = a->x - b->x;
