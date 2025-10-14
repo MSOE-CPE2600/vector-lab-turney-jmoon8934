@@ -1,15 +1,22 @@
 /***************************************************************************
-* Filename: 
+* Filename: calc.h
 * Author: Jeric Moon
-* Date: 
-* Desc: 
-* Note: 
+* Date: 10/08/2025
+* Desc: Header file for calc.c
 ****************************************************************************/
+#ifndef CALC_H
+#define CALC_H 
 
 #include "vect.h"
 
-myvector vectadd(myvector *a, myvector *b);
+void vectname(myvect *a, char *name);
 
-myvector vectsub(myvector *a, myvector *b);
+void vectcopy(myvect *destination, myvect *source);
 
-myvector scalarmult(myvector *a, float b);
+myvect vectadd(myvect *a, myvect *b);
+
+myvect vectsub(myvect *a, myvect *b);
+
+myvect scalarmult(myvect *a, float k);
+
+#endif 

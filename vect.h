@@ -1,18 +1,18 @@
 /***************************************************************************
-* Filename: 
+* Filename: vect.h
 * Author: Jeric Moon
-* Date: 
-* Desc: 
+* Date: 10/01/2025
+* Desc: Header file which defines myvect struct
 ****************************************************************************/
-#ifndef MYVECTOR_H
-#define MYVECTOR_H
+#ifndef VECT_H
+#define VECT_H
 
-typedef struct myvector
+typedef struct myvect
 {
     char name[30];
     float x;
     float y;
     float z;
-} myvector;
+} myvect;
 
 #endif 

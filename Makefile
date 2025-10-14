@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-c -Wall
 LDFLAGS=
-SOURCES= main.c calc.c parser.c 
+SOURCES= main.c calc.c parser.c linkedlist.c 
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=calculator
 
