@@ -20,4 +20,18 @@ typedef struct linked_list
     node *tail;
 } linked_list;
 
+linked_list llInit(void);
+
+int llSize(linked_list *my_list);
+
+int llPushToFront(linked_list *my_list, myvect *to_store);
+
+int llPushBack(linked_list *my_list, myvect *to_store);
+
+int llInstertAfter(linked_list *my_list, node *insert_node, myvect *to_store);
+
+int llRemove(linked_list *my_list, node *rmv_node);
+
+void llClear(linked_list *my_list);
+
 #endif 
