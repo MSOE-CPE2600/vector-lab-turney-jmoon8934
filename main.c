@@ -132,7 +132,7 @@ int main(void)
                     {
                         //csv_location returns num chars up to .csv, or full str if csv is not present
                         int csv_location = strcspn(file_location, ".csv");
-                        char *temp = "";
+                        char temp[100];
                         //append file_location str up to .csv / full csv if not present to temp
                         strncat(temp, file_location, csv_location);
                         //append .csv to temp
@@ -150,24 +150,23 @@ int main(void)
                     bool save = !strcmp(tokens[0], "save");
                     if(save)
                     {
-                        fp = fopen(file_location, 'w');
+                        fp = fopen(file_location, "w");
                     } 
                     else
                     {
                         fp = fopen(file_location, "r");
                     }
                     //Check to see if fp is null before using it.
-                    if(!fp){
-                        printf("Error finding file! Please try a different file.\n");
+                    if(fp){
                         if(save)
                         {
                             node *curr = vectors.head;
                             while(curr)
                             {
-                                char *temp;
-                                sprintf(temp, "%s,%f,%f,%f\n", curr->vect->name, curr->vect->x, curr->vect->y, curr->vect->z);
-                                fputs(temp, fp);
+                                fprintf(fp, "%s,%f,%f,%f\n", curr->vect->name, curr->vect->x, curr->vect->y, curr->vect->z);
+                                curr = curr->next;
                             }
+                            printf("Finished saving to file!\n");
                         }
                         else
                         {
@@ -176,16 +175,7 @@ int main(void)
                     }
                     else
                     {
-                        //if save, do file writing
-                        //else, do file loading
-                        if(save)
-                        {
-                            ftrunctate(fp, 0);
-                        }
-                        else
-                        {
-
-                        }
+                        printf("Error finding file! Please try a different file.\n");
                     }
                 }
                 else if(tokens[0][0] >= '0' && tokens[0][0] <= '9'){
