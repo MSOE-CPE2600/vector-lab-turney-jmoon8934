@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 #include "calc.h"
 #include "vect.h"
@@ -18,9 +19,11 @@
 //Main method, handles the bulk of the program.
 int main(void)
 {
+    //Define variables used throughout the program
     linked_list vectors = llInit();
     char user_input[100];
     bool quit = false;
+    FILE *fp; 
     //Intro + prompt user for command
     printf("Welcome to VectLab! Please enter a command. Enter \"help\" for more info, or \"quit\" to quit.\n");
     while(!quit)
@@ -70,13 +73,19 @@ int main(void)
                     printf("%-15s - Exits the program.\n", "quit"); //Done
                     printf("%-15s - Lists all vectors.\n", "list, or ls"); //Done
                     printf("%-15s - Clears all vectors.\n", "clear"); //Done
+                    printf("%-15s - Saves loaded vectors into provided filename.\n", "save");
+                    printf("%-15s - Loads vectors from provided filename, if file exists.\n" , "load");
+                    printf("%-15s     - Loading will clear all vectors currently stored.\n", "");
+                    printf("%-15s     - Saving to an existing file will overwrite the file.\n", "");
+                    printf("%-15s     - File paths must not contain spaces.\n", "");
+                    printf("%-15s     - Relative or absolute paths work.\n", "");
                     printf("%-15s - Displays the value of vector A.\n", "A"); //Done?
-                    printf("%-15s - Adds vector A and vector B.\n", "A + B");
-                    printf("%-15s - Subtracts vector B from vector A.\n", "A - B");
-                    printf("%-15s - Creates new or replaces existing vector with given xy values. Z is optional.\n", "C = x y [z]");
-                    printf("%-15s - Displays scalar mult k * vector B.\n", "k B or B k");
-                    printf("%-15s - Vector 'C' value of opperation between A and B.\n", "C = A [+, -] B");
-                    printf("%-15s - Vector 'C' takes value of opperation between scalar and A.\n", "C = k A or A k");
+                    printf("%-15s - Adds vector A and vector B.\n", "A + B"); //Done
+                    printf("%-15s - Subtracts vector B from vector A.\n", "A - B"); //Done
+                    printf("%-15s - Creates new or replaces existing vector with given xy values. Z is optional.\n", "C = x y [z]"); //Done
+                    printf("%-15s - Displays scalar mult k * vector B.\n", "k B or B k"); //Done
+                    printf("%-15s - Vector 'C' value of opperation between A and B.\n", "C = A [+, -] B"); //Done
+                    printf("%-15s - Vector 'C' takes value of opperation between scalar and A.\n", "C = k A or A k"); //Done
 
                     printf("\nImportant info!\n)");
                     printf("Expressions must contain a single space around each piece.\n");
@@ -111,8 +120,75 @@ int main(void)
             }
             else if(position == 1)
             {
-                //Only valid expression with pos = 1 (num tokens = 2) are k A or A k (scalar mult).
-                if(tokens[0][0] >= '0' && tokens[0][0] <= '9'){
+                //Only valid expressions with pos = 1 (num tokens = 2) are scalar mult and FILE-IO.
+                if(!strcmp(tokens[0], "save") || !strcmp(tokens[0], "load"))
+                {
+                    char *file_location = tokens[1];
+                    //check if str is 5 chars or longer (for .csv)
+                    //if does not end in .csv, append .csv
+                    //fp = fopen(fp)
+                    //check if fp is null
+                    if(strlen(file_location)>= 5)
+                    {
+                        //csv_location returns num chars up to .csv, or full str if csv is not present
+                        int csv_location = strcspn(file_location, ".csv");
+                        char *temp = "";
+                        //append file_location str up to .csv / full csv if not present to temp
+                        strncat(temp, file_location, csv_location);
+                        //append .csv to temp
+                        strcat(temp, ".csv");
+                        //copy temp into file_location
+                        strcpy(file_location, temp);
+                    } 
+                    else
+                    {
+                        strcat(file_location, ".csv");
+                    }
+                    //if command is save, store value into bool 
+                    //if save, write to fp location
+                    //else, read file
+                    bool save = !strcmp(tokens[0], "save");
+                    if(save)
+                    {
+                        fp = fopen(file_location, 'w');
+                    } 
+                    else
+                    {
+                        fp = fopen(file_location, "r");
+                    }
+                    //Check to see if fp is null before using it.
+                    if(!fp){
+                        printf("Error finding file! Please try a different file.\n");
+                        if(save)
+                        {
+                            node *curr = vectors.head;
+                            while(curr)
+                            {
+                                char *temp;
+                                sprintf(temp, "%s,%f,%f,%f\n", curr->vect->name, curr->vect->x, curr->vect->y, curr->vect->z);
+                                fputs(temp, fp);
+                            }
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                    else
+                    {
+                        //if save, do file writing
+                        //else, do file loading
+                        if(save)
+                        {
+                            ftrunctate(fp, 0);
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                }
+                else if(tokens[0][0] >= '0' && tokens[0][0] <= '9'){
                     //Due to stipulation that vector names can't start with numbers, check if first digit is a number character.
                     //If it is, convert to int, then check to see if next token is a vector.
                     //Then apply scalar mult or error code
