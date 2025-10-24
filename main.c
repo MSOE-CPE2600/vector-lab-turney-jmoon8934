@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "calc.h"
 #include "vect.h"
@@ -170,8 +171,52 @@ int main(void)
                         }
                         else
                         {
-
+                            llClear(&vectors);
+                            char line[100];
+                            char *parsing [5];
+                            for(int j = 0; j < 5; j++)
+                            {
+                                parsing[j] = NULL;
+                            }
+                            while(fgets(line, 100, fp))
+                            {
+                                //reset parsing position to 0
+                                int parsing_pos = 0;
+                                //do the first strok for the name (must be present)
+                                parsing[parsing_pos] = strtok(line, ",");                               
+                                while(parsing_pos < 7 && parsing[parsing_pos] != NULL)
+                                {
+                                    parsing_pos++;
+                                    parsing[parsing_pos] = strtok(NULL, ",\n");
+                                }
+                                //decriment parsing pos to have value 1+last element index
+                                if(parsing_pos != 5)
+                                {
+                                    printf("Invalid line detected while parsing. Skipping line.\n");
+                                }
+                                else
+                                {
+                                    myvect vect = {0};
+                                    strcpy(vect.name, parsing[0]);
+                                    //utilize errno for edge case parsing[] = 0.00)
+                                    errno = 0;
+                                    double values[3] = {strtod(parsing[1], NULL), strtod(parsing[2], NULL), strtod(parsing[3], NULL)};
+                                    if(errno == 0)
+                                    {
+                                        vect.x = values[0];
+                                        vect.y = values[1];
+                                        vect.z = values[2];
+                                        llPushBack(&vectors, &vect);
+                                    }
+                                    else
+                                    {
+                                        printf("Invalid data detected, skipping line.\n");
+                                    }
+                                }
+                            }
                         }
+                        //cloes file pointer
+                        fclose(fp);
                     }
                     else
                     {
