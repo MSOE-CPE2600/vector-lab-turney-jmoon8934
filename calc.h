@@ -9,14 +9,14 @@
 
 #include "vect.h"
 
-void vectname(myvect *a, char *name);
+void vectname(myvect *source, char *name);
 
 void vectcopy(myvect *destination, myvect *source);
 
-myvect vectadd(myvect *a, myvect *b);
+void vectadd(myvect *result, myvect *source1, myvect *source2);
 
-myvect vectsub(myvect *a, myvect *b);
+void vectsub(myvect *result, myvect *source1, myvect *source2);
 
-myvect scalarmult(myvect *a, float k);
+void scalarmult(myvect *result, myvect *source, float k);
 
 #endif 

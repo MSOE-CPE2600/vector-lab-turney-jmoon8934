@@ -8,11 +8,12 @@
 
 #include "vect.h"
 
-void vectname(myvect *a, char *name)
+void vectname(myvect *source, char *name)
 {
     //Adjusts the name of a vector, if need be.
-    strcpy(a->name, name);
+    strcpy(source->name, name);
 }
+
 
 void vectcopy(myvect *destination, myvect *source)
 {
@@ -23,32 +24,26 @@ void vectcopy(myvect *destination, myvect *source)
     destination->z = source->z;
 }
 
-myvect vectadd(myvect *a, myvect *b)
+void vectadd(myvect *result, myvect *source1, myvect *source2)
 {
     //Adds vect a & b, returns a nameless vector
-    myvect result;
-    result.x = a->x + b->x;
-    result.y = a->y + b->y;
-    result.z = a->z + b->z;
-    return result;
+    result->x = source1->x + source2->x;
+    result->y = source1->y + source2->y;
+    result->z = source1->z + source2->z;
 }
 
-myvect vectsub(myvect *a, myvect *b)
+void vectsub(myvect *result, myvect *source1, myvect *source2)
 {
     //Subtracts vect b from a, returns a nameless vector
-    myvect result;
-    result.x = a->x - b->x;
-    result.y = a->y - b->y;
-    result.z = a->z - b->z;
-    return result;
+    result->x = source1->x - source2->x;
+    result->y = source1->y - source2->y;
+    result->z = source1->z - source2->z;
 }
 
-myvect scalarmult(myvect*a, float k)
+void scalarmult(myvect *result, myvect *source, float k)
 {
-    //Applies a scalar mult k to vector a, returns a nameless vector
-    myvect result;
-    result.x = a->x*k;
-    result.y = a->y*k;
-    result.z = a->z*k;
-    return result;
+    //Applies a scalar mult k to vector source, update values of vector result
+    result->x = source->x*k;
+    result->y = source->y*k;
+    result->z = source->z*k;
 }

@@ -1,9 +1,9 @@
 CC=gcc
-CFLAGS=-c -Wall
+CFLAGS=-c -Wall -g
 LDFLAGS=
 SOURCES= main.c calc.c parser.c linkedlist.c 
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=calculator
+EXECUTABLE=calculator.exe
 
 all: $(SOURCES) $(EXECUTABLE) 
 

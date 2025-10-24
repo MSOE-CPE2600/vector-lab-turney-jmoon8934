@@ -12,8 +12,21 @@
 static node *makeNode(myvect *vector)
 {
     node *new_node = malloc(sizeof(node));
+    //Explicitly check if malloc fails
+    if(!new_node)
+    {
+        return NULL;
+    }
     new_node->vect = malloc(sizeof(myvect));
-    new_node->vect = vector;
+    //Explicitly check vector freeing works.
+    //If not, free the node (it's unused) and return null.
+    if(!new_node->vect)
+    {
+        free(new_node);
+        return NULL;
+    }
+    new_node->next = NULL;
+    new_node->prev = NULL;
     return new_node;
 }
 
@@ -65,10 +78,17 @@ int llPushToFront(linked_list *my_list, myvect *to_store)
 
 int llPushBack(linked_list *my_list, myvect *to_store)
 {
-        if(to_store)
-    {
-        node *new_node = makeNode(to_store);
 
+    //if the vect pointer is null
+    if(!to_store)
+    {
+        return -1;
+    }
+    node *new_node = makeNode(to_store);
+    //if the new_node ptr isn't null
+    if(new_node)
+    {
+        *(new_node->vect) = *to_store;
         if(my_list->head == NULL)
         {
             my_list->head = my_list->tail = new_node;
@@ -76,7 +96,7 @@ int llPushBack(linked_list *my_list, myvect *to_store)
         else
         {
             my_list->tail->next = new_node;
-            new_node->next = NULL;
+            new_node->prev = my_list->tail;
             my_list->tail = new_node;
         }
         return 0;

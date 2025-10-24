@@ -11,26 +11,47 @@
 #include "calc.h"
 #include "vect.h"
 #include "parser.h"
+#include "linkedlist.h"
 
-void vect_values(myvect a, char *output)
+void vect_values(myvect *a, char *output)
 {
     //Formats a vector's values for printing
-    sprintf(output, "%-10f %-10f %-10f", a.x, a.y, a.z);
+    sprintf(output, "%-10f %-10f %-10f", a->x, a->y, a->z);
 }
 
-int vect_name_contains(char *name, myvect *list, int array_size)
+myvect *vect_name_contains(char *name, linked_list *list)
 {
-    //Checks to see if a given vector array contains a vector with the passed in name.
-    int pos = -1;
-    bool found = false;
-    for(int i = 0; i < array_size && !found; i++)
+    node *curr = list->head;
+    while(curr)
     {
-            if(!strcmp(list[i].name, name))
+        //Explicitly check if they're equal by comparing result to 0.
+        if(strcmp(curr->vect->name, name) == 0)
         {
-            found = true;
-            pos = i;
+            return curr->vect;
         }
-
+        else
+        {
+            curr = curr->next;
+        }
     }
-    return pos;
+    return NULL;
+}
+
+void listVectors(linked_list *my_list)
+{
+    node *curr = my_list->head;
+    while(curr)
+    {
+        char myvect_printout[50];
+        vect_values(curr->vect, myvect_printout);
+        printf("Value of vector: %s is %s\n", curr->vect->name, myvect_printout);
+        curr = curr->next;
+    }
+}
+
+void printVector(myvect *a)
+{
+    char myvect_printout[50];
+    vect_values(a, myvect_printout);
+    printf("Value of vector: %s is %s\n", a->name, myvect_printout);
 }

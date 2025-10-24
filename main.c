@@ -14,19 +14,11 @@
 #include "parser.h"
 #include "linkedlist.h"
     
-//define program vector capacity
-const int VECTOR_CAPACITY = 10;
+
 //Main method, handles the bulk of the program.
 int main(void)
 {
-    //Initialize vector array and fill it with value-less, empty name vectors
-    myvect vectors[VECTOR_CAPACITY];
-    int vector_array_size = 0;
-    for(int i = 0; i < VECTOR_CAPACITY; i++)
-    {
-        strcpy(vectors[i].name, "");
-    }
-    //Define user_input and quit variable
+    linked_list vectors = llInit();
     char user_input[100];
     bool quit = false;
     //Intro + prompt user for command
@@ -46,7 +38,7 @@ int main(void)
         //position used to track number of elements and 
         int position = 0;
         tokens[position] = strtok(user_input, " \n");
-        while(tokens[position] != NULL && position < 5)
+        while(position < 5 && tokens[position] != NULL)
         {
             position++;
             tokens[position] = strtok(NULL, " \n");
@@ -74,16 +66,16 @@ int main(void)
                 {
                     //Displaying all list of recognized commands and other important info.
                     printf("List of commands:\n");
-                    printf("%-15s - Displays this list.\n", "help"); //Done
+                    printf("%-15s - Displays this dialogue.\n", "help"); //Done
                     printf("%-15s - Exits the program.\n", "quit"); //Done
-                    printf("%-15s - Lists all vectors.\n", "list"); //Done
+                    printf("%-15s - Lists all vectors.\n", "list, or ls"); //Done
                     printf("%-15s - Clears all vectors.\n", "clear"); //Done
                     printf("%-15s - Displays the value of vector A.\n", "A"); //Done?
                     printf("%-15s - Adds vector A and vector B.\n", "A + B");
                     printf("%-15s - Subtracts vector B from vector A.\n", "A - B");
                     printf("%-15s - Creates new or replaces existing vector with given xy values. Z is optional.\n", "C = x y [z]");
                     printf("%-15s - Displays scalar mult k * vector B.\n", "k B or B k");
-                    printf("%-15s - Vector 'C' value of opperation between A and B or A and scalar mult k.\n", "C = A [+, -] B");
+                    printf("%-15s - Vector 'C' value of opperation between A and B.\n", "C = A [+, -] B");
                     printf("%-15s - Vector 'C' takes value of opperation between scalar and A.\n", "C = k A or A k");
 
                     printf("\nImportant info!\n)");
@@ -91,44 +83,25 @@ int main(void)
                     printf("Vectors cannot have their name start with numbers.\n");
                     printf("Decimals must contain leading 0! (0.1)\n");
                     printf("Commands are case sensitive! \"Help\" will not work, but \"help\" will.\n");
-                    printf("The program has a maximum of ten vectors.\n\n");
                 }
-                else if (!strcmp(tokens[0], "list"))
+                else if (!strcmp(tokens[0], "list") || !strcmp(tokens[0], "ls"))
                 {
                     //Lists each vector, checking to see if the vector pointer is null.
                     printf("\nListing vectors..\n");
-                    for(int i = 0; i < VECTOR_CAPACITY; i++)
-                    {
-                        char myvect_printout[50];
-                        if (strcmp(vectors[i].name, "") != 0)
-                        {
-                            vect_values(vectors[i], myvect_printout);
-                            printf("Value of vector %d: %s is %s\n", i+1, vectors[i].name, myvect_printout);
-                        }
-                    }
+                    listVectors(&vectors);
                     printf("All known vectors listed!\n\n");
                 }
                 else if(!strcmp(tokens[0], "clear"))
                 {
-                    //Clears all vectors, resets size to 0.
                     printf("Clearing vectors..\n");
-                    for(int i = 0; i < VECTOR_CAPACITY; i++)
-                    {
-                        strcpy(vectors[i].name, "");
-                        vectors[i].x = 0.0;
-                        vectors[i].y = 0.0;
-                        vectors[i].z = 0.0;
-                    }
-                    vector_array_size = 0;
+                    llClear(&vectors);
                 }
                 else 
                 {
-                    int pos = vect_name_contains(tokens[0], vectors, VECTOR_CAPACITY);
-                    if(pos != -1)
+                    myvect *vect = vect_name_contains(tokens[0], &vectors);
+                    if(vect)
                     {
-                        char myvect_printout[50];
-                        vect_values(vectors[pos], myvect_printout);
-                        printf("Value of vector: %s is %s\n", vectors[pos].name, myvect_printout);
+                       printVector(vect);
                     }
                     else
                     {
@@ -143,15 +116,15 @@ int main(void)
                     //Due to stipulation that vector names can't start with numbers, check if first digit is a number character.
                     //If it is, convert to int, then check to see if next token is a vector.
                     //Then apply scalar mult or error code
-                    int pos = vect_name_contains(tokens[1], vectors, VECTOR_CAPACITY);
-                    if(pos != -1)
+                    myvect *vect = vect_name_contains(tokens[1], &vectors);
+                    if(vect)
                     {
-                        //Convert scalar_mult token to float.
-                        float scalar_mult = atof(tokens[0]);
-                        myvect scaled_vector = scalarmult(&vectors[pos], scalar_mult);
-                        char myvect_printout[50];
-                        vect_values(scaled_vector, myvect_printout);
-                        printf("Value of expression: %s\n", myvect_printout);
+                        //Temporary scaled_vector just to print value.
+                        myvect scaled_vector;
+                        //Convert mult token to float
+                        float scalar_mult = atof(tokens[1]);
+                        scalarmult(&scaled_vector, vect, scalar_mult);
+                        printVector(&scaled_vector);
                     } 
                     else
                     {
@@ -164,14 +137,15 @@ int main(void)
                 {
                     //If first token isn't a number, check if 2nd one is.
                     //Repeat steps
-                    int pos = vect_name_contains(tokens[0], vectors, VECTOR_CAPACITY);
-                    if(pos != -1)
+                    myvect *vect = vect_name_contains(tokens[1], &vectors);
+                    if(vect)
                     {
+                        //Temporary scaled_vector just to print value.
+                        myvect scaled_vector;
+                        //Convert mult token to float
                         float scalar_mult = atof(tokens[1]);
-                        myvect scaled_vector = scalarmult(&vectors[pos], scalar_mult);
-                        char myvect_printout[50];
-                        vect_values(scaled_vector, myvect_printout);
-                        printf("Value of expression: %s\n", myvect_printout);
+                        scalarmult(&scaled_vector, vect, scalar_mult);
+                        printVector(&scaled_vector);
                     } 
                     else
                     {  
@@ -189,31 +163,39 @@ int main(void)
             else if(position == 2)
             {
                 //Only valid expressions with pos = 2 (num tokens = 3) are A [opperator] B.
-                int pos1 = vect_name_contains(tokens[0], vectors, VECTOR_CAPACITY);
-                int pos2 = vect_name_contains(tokens[2], vectors, VECTOR_CAPACITY);
-                if(pos1 != -1 && pos2 != -1)
+                myvect *vect1 = vect_name_contains(tokens[0], &vectors);
+                myvect *vect2 = vect_name_contains(tokens[2], &vectors);
+                if(vect1 && vect2)
                 {
                     //If the vectors exist, check to see if the middle token (opperator) is valid.
                     if(!strcmp(tokens[1], "+") || !strcmp(tokens[1], "-") || !strcmp(tokens[1], "="))
                     {
+                        char result_string[100];
+                        sprintf(result_string, "%s %s %s", tokens[0], tokens[1], tokens[2]);
                         if(!strcmp(tokens[1], "="))
                         {
                             //If takes the form A = B, update A to copy of B
-                            vectcopy(&vectors[pos1], &vectors[pos2]);
+                            char vect1_name[30];
+                            strcpy(vect1_name, vect1->name);
+                            vectcopy(vect1, vect2);
+                            strcpy(vect1->name, vect1_name);
+                            printVector(vect1);
                         }
                         else if(!strcmp(tokens[1], "+"))
                         {
-                            myvect result = vectadd(&vectors[pos1], &vectors[pos2]);
-                            char myvect_printout[50];
-                            vect_values(result, myvect_printout);
-                            printf("Value of expression: %s\n", myvect_printout);
+                            //Temporary vector just to print out operation
+                            myvect result;
+                            vectadd(&result, vect1, vect2);
+                            strcpy(result.name, result_string);
+                            printVector(&result);
                         }
                         else if(!strcmp(tokens[1], "-"))
                         {
-                            myvect result = vectsub(&vectors[pos1], &vectors[pos2]);
-                            char myvect_printout[50];
-                            vect_values(result, myvect_printout);
-                            printf("Value of expression: %s\n", myvect_printout);
+                            //Temporary vector just to print out operation
+                            myvect result;
+                            vectsub(&result, vect1, vect2);
+                            strcpy(result.name, result_string);
+                            printVector(&result);
                         }
                     }
                     else
@@ -224,11 +206,11 @@ int main(void)
                 }
                 //Error statements if vector 1 or 2 aren't found.
                 //Not if-else because both can not exist.
-                if(pos1 == -1)
+                if(!vect1)
                 {
                     printf("First vector %s not recognized. Please enter a new command.\n", tokens[0]);
                 }
-                if(pos2 == -1)
+                if(!vect2)
                 {
                     printf("Second vector %s not recognized. Please enter a new command.\n", tokens[2]);
                 }
@@ -244,62 +226,43 @@ int main(void)
                     if(tokens[0][0] <= '0' || tokens[0][0] >= '9')
                     {
                         //Check to see if first vector doesn't exist
-                        int pos1 = vect_name_contains(tokens[0], vectors, VECTOR_CAPACITY);
-                        bool too_many_vectors = false;
-                        if(pos1 == -1)
+                        myvect *vect1 = vect_name_contains(tokens[0], &vectors);
+                        if(!vect1)
                         {
-                            //If vector doesn't already exist, make a new vector, try to add it.
-                            if(vector_array_size < 10)
-                            {
-                                strcpy(vectors[vector_array_size].name, tokens[0]);
-                                pos1 = vector_array_size;
-                                vector_array_size++;
-                                //Values will be added later. Update pos1 from -1.
-                            }
-                            else
-                            {
-                                too_many_vectors = true;
-                            }
-                        }
-                        //Check if there are too many vectors before doing operations/assignments, 
+                            myvect vect = {0};
+                            vect.x = 0;
+                            vect.y = 0;
+                            vect.z = 0;
+                            strcpy(vect.name, tokens[0]);
+                            llPushBack(&vectors, &vect);
+                            vect1 = vect_name_contains(tokens[0], &vectors);
+                        } 
                         //Value assignment code is reused between new vector assignment and vector replacement
                         //Check if token 2 doesnt start with a number
                         //Check if token 3 doesnt start with a number
                         //If both start with numbers, its form A = x y
                         //If one starts with number & other doesnt, it's form C = A 10 || C = 10 A
-                        if(too_many_vectors)
-                        {
-                            printf("Error! Too many vectors! Please clear or redefine a vector to change entries.\n");
-                        }
-                        else if((tokens[2][0] >= '0' && tokens[2][0] <= '9') && (tokens[3][0] >= '0' && tokens[3][0] <= '9'))
+                        if((tokens[2][0] >= '0' && tokens[2][0] <= '9') && (tokens[3][0] >= '0' && tokens[3][0] <= '9'))
                         {
                             //Form A = x y
-                            vectors[pos1].x = atof(tokens[2]);
-                            vectors[pos1].y = atof(tokens[3]);
-                            vectors[pos1].z = 0.0;
+                            vect1->x = atof(tokens[2]);
+                            vect1->y = atof(tokens[3]);
+                            vect1->z = 0.0;
                             //Print out new vector values
-                            char myvect_printout[50];
-                            vect_values(vectors[pos1], myvect_printout);
-                            printf("Value of expression: %s\n", myvect_printout);
+                            printVector(vect1);
                         }
                         else if(tokens[2][0] >= '0' && tokens[2][0] <= '9')
                         {
                             //Form C = A 10
                             //Check if A exists
-                            int pos2 = vect_name_contains(tokens[3], vectors, VECTOR_CAPACITY);
-                            if(pos2 != -1)
+                            myvect *vect2 = vect_name_contains(tokens[3], &vectors);
+                            if(vect2)
                             {
                                 //Convert scalar_mult token to float.
                                 float scalar_mult = atof(tokens[2]);
-                                myvect scaled_vector = scalarmult(&vectors[pos2], scalar_mult);
-                                char name[50];
-                                strcpy(name, vectors[pos1].name);
-                                vectcopy(&vectors[pos1], &scaled_vector);
-                                strcpy(vectors[pos1].name, name);
+                                scalarmult(vect1, vect2, scalar_mult);
                                 //Print out new vector values
-                                char myvect_printout[50];
-                                vect_values(vectors[pos1], myvect_printout);
-                                printf("Value of expression: %s\n", myvect_printout);
+                                printVector(vect1);
                             }
                             else
                             {
@@ -310,19 +273,13 @@ int main(void)
                         {
                             //Form C = 10 A
                             //Check if A exists
-                            int pos2 = vect_name_contains(tokens[2], vectors, VECTOR_CAPACITY);
-                            if(pos2 != -1){
+                            myvect *vect2 = vect_name_contains(tokens[2], &vectors);
+                            if(vect2){
                                 //Convert scalar_mult token to float.
                                 float scalar_mult = atof(tokens[3]);
-                                myvect scaled_vector = scalarmult(&vectors[pos2], scalar_mult);
-                                char name[50];
-                                strcpy(name, vectors[pos1].name);
-                                vectcopy(&vectors[pos1], &scaled_vector);
-                                strcpy(vectors[pos1].name, name);
+                                scalarmult(vect1, vect2, scalar_mult);
                                 //Print out new vector values
-                                char myvect_printout[50];
-                                vect_values(vectors[pos1], myvect_printout);
-                                printf("Value of expression: %s\n", myvect_printout);
+                                printVector(vect1);
                             }
                             else
                             {
@@ -356,86 +313,58 @@ int main(void)
                     if(tokens[0][0] <= '0' || tokens[0][0] >= '9')
                     {
                         //Check to see if first vector doesn't exist
-                        int pos1 = vect_name_contains(tokens[0], vectors, VECTOR_CAPACITY);
-                        bool too_many_vectors = false;
-                        if(pos1 == -1)
+                        myvect *vect1 = vect_name_contains(tokens[0], &vectors);
+                        if(!vect1)
                         {
-                            //If vector doesn't already exist, make a new vector, try to add it.
-                            if(vector_array_size < 10)
-                            {
-                                strcpy(vectors[vector_array_size].name, tokens[0]);
-                                pos1 = vector_array_size;
-                                vector_array_size++;
-                                //Values will be added later. Update pos1 from -1
-
-                            }
-                            else
-                            {
-                                too_many_vectors = true;
-                            }
-                        }
+                            myvect vect = {0};
+                            vect.x = 0;
+                            vect.y = 0;
+                            vect.z = 0;
+                            strcpy(vect.name, tokens[0]);
+                            llPushBack(&vectors, &vect);
+                            vect1 = vect_name_contains(tokens[0], &vectors);
+                        } 
                         //Check to see if there are too many vectors
                         //Code is reused between reassigning and defining new vector
                         //Check if tokens[2], [3], and [4] are all numbers. Form A = x y z.
                         //Else, check tokens[3] is equal to "+" or "-"
                         //If tokens[3] is an opperator, check if tokens[2] and [4] are valid vectors
                         //Finally, reassign and preform opperation
-                        if(too_many_vectors){
-                            printf("Error! Too many vectors! Please clear or redefine a vector to change entries.\n");
-                        }
-                        else if((tokens[2][0] >= '0' && tokens[2][0] <= '9') && ((tokens[3][0] >= '0' && tokens[3][0] <= '9')) && (tokens[4][0] >= '0' && tokens[4][0] <= '9'))
+                        if((tokens[2][0] >= '0' && tokens[2][0] <= '9') && ((tokens[3][0] >= '0' && tokens[3][0] <= '9')) && (tokens[4][0] >= '0' && tokens[4][0] <= '9'))
                         {
                             //Form A = x y z
-                            vectors[pos1].x = atof(tokens[2]);
-                            vectors[pos1].y = atof(tokens[3]);
-                            vectors[pos1].z = atof(tokens[4]);
+                            vect1->x = atof(tokens[2]);
+                            vect1->y = atof(tokens[3]);
+                            vect1->z = atof(tokens[4]);
                             //Print out new vector values.
-                            char myvect_printout[50];
-                            vect_values(vectors[pos1], myvect_printout);
-                            printf("Value of vector: %s\n", myvect_printout);
+                            printVector(vect1);
                         }
                         else if(!strcmp(tokens[3], "-") || !strcmp(tokens[3], "+"))
                         {
                             //Form C = A [+/-] B
-                            int pos2 = vect_name_contains(tokens[2], vectors, VECTOR_CAPACITY);
-                            int pos3 = vect_name_contains(tokens[4], vectors, VECTOR_CAPACITY);
-                            if(pos2 != -1 && pos3 != -1)
+                            myvect *vect2 = vect_name_contains(tokens[2], &vectors);
+                            myvect *vect3 = vect_name_contains(tokens[4], &vectors);
+                            if(vect2 && vect3)
                             {
                                 //If vectors A & B are real, check to see if opperator is valid
                                 //If opperator is valid, preform operation, update new vector
                                 if(!strcmp(tokens[3], "+"))
                                 {
-                                    vectors[pos1] = vectadd(&vectors[pos2], &vectors[pos3]);
+                                    vectadd(vect1, vect2, vect3);
                                     //Reupdate name, direct vectadd does not preserve name
-                                    strcpy(vectors[pos1].name, tokens[0]);
-                                    char myvect_printout[50];
-                                    vect_values(vectors[pos1], myvect_printout);
-                                    printf("Value of expression: %s\n", myvect_printout);
+                                    printVector(vect1);
                                 }
                                 else if(!strcmp(tokens[3], "-"))
                                 {
-                                    vectors[pos1] = vectsub(&vectors[pos2], &vectors[pos3]);
+                                    vectsub(vect1, vect2, vect3);
                                     //Reupdate name, direct vectadd does not preserve name
-                                    strcpy(vectors[pos1].name, tokens[0]);
-                                    char myvect_printout[50];
-                                    vect_values(vectors[pos1], myvect_printout);
-                                    printf("Value of expression: %s\n", myvect_printout);
+                                    printVector(vect1);
                                 }
                                 else
                                 {
                                     printf("Invalid opperator! Please enter a new command!\n");
                                 }
                             }
-                            //Error if vector A or B are not found
-                            if(pos2 == -1)
-                            {
-                                printf("Error! Vector %s not found!\n", tokens[2]);
-                            }
-                            if(pos3 == -1)
-                            {
-                                printf("Error! Vector %s not found!\n", tokens[3]);
-                            }
-
                         }
                         else 
                         {
@@ -458,6 +387,7 @@ int main(void)
         }
     }
     printf("Thank you for using my vector calculator!\n");
+    llClear(&vectors);
     return 0;
 }
 

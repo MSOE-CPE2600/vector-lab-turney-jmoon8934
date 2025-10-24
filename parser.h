@@ -8,9 +8,13 @@
 #define PARSER_H 
 
 #include "vect.h"
+#include "linkedlist.h"
 
-void vect_values(myvect a, char *output);
+void vect_values(myvect *a, char *output);
 
-int vect_name_contains(char *name, myvect *list, int array_size);
+myvect *vect_name_contains(char *name, linked_list *list);
 
+void listVectors(linked_list *my_list);
+
+void printVector(myvect *a);
 #endif 
