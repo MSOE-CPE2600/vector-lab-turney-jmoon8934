@@ -1,7 +1,7 @@
 /***************************************************************************
 * Filename: main.c
 * Author: Jeric Moon
-* Date: 10/09/2025
+* Date: 10/24/2025
 * Desc: Provides the main user input parsing and vector handling
 ****************************************************************************/
 #include <string.h>
@@ -42,7 +42,7 @@ int main(void)
         //position used to track number of elements and 
         int position = 0;
         tokens[position] = strtok(user_input, " \n");
-        while(position < 5 && tokens[position] != NULL)
+        while(position < 6 && tokens[position] != NULL)
         {
             position++;
             tokens[position] = strtok(NULL, " \n");
@@ -171,10 +171,12 @@ int main(void)
                         }
                         else
                         {
+                            //If !save (loading), clear all vectors
                             llClear(&vectors);
                             char line[100];
-                            char *parsing [5];
-                            for(int j = 0; j < 5; j++)
+                            char *parsing [6];
+                            //Initialize array of strs to hold csv values
+                            for(int j = 0; j < 6; j++)
                             {
                                 parsing[j] = NULL;
                             }
@@ -196,6 +198,7 @@ int main(void)
                                 }
                                 else
                                 {
+                                    //If the line syntax is correct, start parsing values
                                     myvect vect = {0};
                                     strcpy(vect.name, parsing[0]);
                                     //utilize errno for edge case parsing[] = 0.00)

@@ -1,8 +1,9 @@
 /***************************************************************************
 * Filename: linkedlist.c
 * Author: Jeric Moon
-* Date: 10/14/2025
+* Date: 10/20/2025
 * Desc: Provides method functionalities for a linked list implementation
+* Credit: Dr. Turney for initial LL implementation
 ****************************************************************************/
 #include <stdlib.h>
 
@@ -160,6 +161,7 @@ int llRemove(linked_list *my_list, node *rmv_node)
 
 void llClear(linked_list *my_list)
 {
+    //while removing node is successful, remove node
     while(!llRemove(my_list, my_list->head))
     {
     }

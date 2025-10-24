@@ -1,7 +1,7 @@
 /***************************************************************************
 * Filename: calc.c
 * Author: Jeric Moon
-* Date: 10/08/2025
+* Date: 10/21/2025
 * Desc: Handles the calculation methods for vector math.
 ****************************************************************************/
 #include <string.h>

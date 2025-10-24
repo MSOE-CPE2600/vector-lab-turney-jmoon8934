@@ -1,7 +1,7 @@
 /***************************************************************************
 * Filename: parser.c
 * Author: Jeric Moon
-* Date: 10/08/2025
+* Date: 10/20/2025
 * Desc: Helper file that contains helper functions to make data parsing easier.
 ****************************************************************************/
 #include <stdio.h>

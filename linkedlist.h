@@ -1,7 +1,7 @@
 /***************************************************************************
 * Filename: linkedlist.h
 * Author: Jeric Moon
-* Date: 10/14/2025
+* Date: 10/20/2025
 * Desc: Header file which defines linkedlist struct, and linked list f-ns
 ****************************************************************************/
 #ifndef LINKED_LIST_H
