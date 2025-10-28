@@ -24,7 +24,7 @@ int main(void)
     linked_list vectors = llInit();
     char user_input[100];
     bool quit = false;
-    FILE *fp; 
+
     //Intro + prompt user for command
     printf("Welcome to VectLab! Please enter a command. Enter \"help\" for more info, or \"quit\" to quit.\n");
     while(!quit)
@@ -124,27 +124,25 @@ int main(void)
                 //Only valid expressions with pos = 1 (num tokens = 2) are scalar mult and FILE-IO.
                 if(!strcmp(tokens[0], "save") || !strcmp(tokens[0], "load"))
                 {
-                    char *file_location = tokens[1];
-                    //check if str is 5 chars or longer (for .csv)
-                    //if does not end in .csv, append .csv
-                    //fp = fopen(fp)
-                    //check if fp is null
+                    FILE *fp; 
+                    char file_location[100];
+                    strcpy(file_location, tokens[1]);
+                    //Check if the file_location is long enough to end in .csv
+                    //If file location is not long enough, append .csv regardless b/c it can't contain it.
                     if(strlen(file_location)>= 5)
                     {
-                        //csv_location returns num chars up to .csv, or full str if csv is not present
-                        int csv_location = strcspn(file_location, ".csv");
-                        char temp[100];
-                        //append file_location str up to .csv / full csv if not present to temp
-                        strncat(temp, file_location, csv_location);
-                        //append .csv to temp
-                        strcat(temp, ".csv");
-                        //copy temp into file_location
-                        strcpy(file_location, temp);
+                        //Check to see if the file_location does end in .csv
+                        if(strcmp(file_location + strlen(file_location) - 4, ".csv") != 0)
+                        {
+                        //append .csv to file_location
+                        strcat(file_location, ".csv");
+                        }
                     } 
                     else
                     {
                         strcat(file_location, ".csv");
                     }
+
                     //if command is save, store value into bool 
                     //if save, write to fp location
                     //else, read file
@@ -164,7 +162,7 @@ int main(void)
                             node *curr = vectors.head;
                             while(curr)
                             {
-                                fprintf(fp, "%s,%f,%f,%f\n", curr->vect->name, curr->vect->x, curr->vect->y, curr->vect->z);
+                                fprintf(fp, "%s,%f,%f,%f,\n", curr->vect->name, curr->vect->x, curr->vect->y, curr->vect->z);
                                 curr = curr->next;
                             }
                             printf("Finished saving to file!\n");
@@ -174,25 +172,20 @@ int main(void)
                             //If !save (loading), clear all vectors
                             llClear(&vectors);
                             char line[100];
-                            char *parsing [6];
                             //Initialize array of strs to hold csv values
-                            for(int j = 0; j < 6; j++)
-                            {
-                                parsing[j] = NULL;
-                            }
+                            char *parsing [7] = {NULL};
                             while(fgets(line, 100, fp))
                             {
                                 //reset parsing position to 0
                                 int parsing_pos = 0;
                                 //do the first strok for the name (must be present)
                                 parsing[parsing_pos] = strtok(line, ",");                               
-                                while(parsing_pos < 7 && parsing[parsing_pos] != NULL)
+                                while(parsing_pos < 6 && parsing[parsing_pos] != NULL)
                                 {
                                     parsing_pos++;
                                     parsing[parsing_pos] = strtok(NULL, ",\n");
                                 }
-                                //decriment parsing pos to have value 1+last element index
-                                if(parsing_pos != 5)
+                                if(parsing_pos != 4)
                                 {
                                     printf("Invalid line detected while parsing. Skipping line.\n");
                                 }
@@ -217,8 +210,10 @@ int main(void)
                                     }
                                 }
                             }
+                            printf("Finished loading vectors!\n");
                         }
-                        //cloes file pointer
+                        //close file pointer & flush it
+                        fflush(fp);
                         fclose(fp);
                     }
                     else
